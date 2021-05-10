@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Calculator</title>
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+			background-color: rgb(165, 69, 221);
+		}
+
+		.calc-grid {
+			display: grid;
+			justify-content: center;
+			align-content: center;
+			min-height: 100vh;
+			grid-template-columns: repeat(4, 100px);
+			grid-template-rows: minmax(120px, auto) repeat(5, 100px);
+		}
+
+		.calc-grid button {
+			cursor: pointer;
+			border: 1px solid white;
+			outline: none;
+			background-color: rgb(255, 255, 255, 0.75);
+		}
+
+		.calc-grid button:hover {
+			background-color: rgb(255, 255, 255, 0.9);
+		}
+
+		.span-two {
+			grid-column: span 2;
+		}
+
+		.result {
+			grid-column: 1/5;
+			background-color: rgb(0, 0, 0, 0.75);
+			display: flex;
+			padding: 10px;
+			flex-direction: column;
+			justify-content: space-around;
+			align-items: flex-end;
+		}
+
+		.result .prev {
+			color: rgb(255, 255, 255, 0.9);
+			font-size: 2rem;
+		}
+
+		.result .current {
+			color: rgb(255, 255, 255, 0.9);
+			font-size: 2rem;
+		}
+
+		#equal {
+			background-color: rgb(83, 145, 226);
+		}
+	</style>
+</head>
+
+<body>
+	<div class="calc-grid">
+		<div class="result">
+			<div class="pre-aperand prev"></div>
+			<div class="cur-operand current"></div>
+		</div>
+		<button class="span-two data-all-clear">C</button>
+		<button class="data-delete">D</button>
+		<button class="data-operation">/</button>
+		<button class="data-number">1</button>
+		<button class="data-number">2</button>
+		<button class="data-number">3</button>
+		<button class="data-operation">*</button>
+		<button class="data-number">4</button>
+		<button class="data-number">5</button>
+		<button class="data-number">6</button>
+		<button class="data-operation">+</button>
+		<button class="data-number">7</button>
+		<button class="data-number">8</button>
+		<button class="data-number">9</button>
+		<button class="data-operation">-</button>
+		<button class="data-number">.</button>
+		<button class="data-number">0</button>
+		<button class="data-equal span-two" id="equal">=</button>
+	</div>
+
+	<script language="javascript">
+		const numbutton = document.querySelectorAll(".data-number");
+		const operationbut = document.querySelectorAll(".data-operation");
+		const equalbuttton = document.querySelector(".data-equal");
+		const deletebutton = document.querySelector(".data-delete");
+		const allcleanbut = document.querySelector(".data-all-clear");
+		const preoperatele = document.querySelector(".pre-aperand");
+		const curoperatele = document.querySelector(".cur-operand");
+
+		class Calculator {
+			constructor(preoperatele, curoperatele) {
+				this.preoperatele = preoperatele;
+				this.curoperatele = curoperatele;
+				this.clear();
+			}
+
+			clear() {
+				this.currentoperand = "";
+				this.preoperand = "";
+				this.operation = undefined;
+			}
+
+			appendnumber(number) {
+				if (number === "." && this.currentoperand.includes(".")) return;
+				this.currentoperand = this.currentoperand.toString() + number.toString();
+			}
+
+			delete() {
+				this.currentoperand = this.currentoperand.toString().slice(0, -1);
+			}
+
+			chooseoperation(operation) {
+				if (this.currentoperand === "") return;
+				if (this.preoperand !== "") {
+					this.cal();
+				}
+
+				this.operation = operation;
+				this.preoperand = this.currentoperand;
+				this.currentoperand = "";
+			}
+
+			cal() {
+				let result;
+				const prev = parseFloat(this.preoperand);
+				const curr = parseFloat(this.currentoperand);
+				if (isNaN(prev) || isNaN(curr)) return;
+
+				switch (this.operation) {
+					case "+":
+						result = prev + curr;
+						break;
+					case "-":
+						result = prev - curr;
+						break;
+					case "*":
+						result = prev * curr;
+						break;
+					case "/":
+						result = prev / curr;
+						break;
+
+					default:
+						break;
+				}
+				this.currentoperand = result;
+				this.operation = undefined;
+				this.preoperand = "";
+			}
+
+			updatedisplay() {
+				this.curoperatele.innerText = this.currentoperand;
+				if (this.operation != null) {
+					this.preoperatele.innerText = `${this.preoperand} ${this.operation}`;
+				}
+				else {
+					this.preoperatele.innerText = this.preoperand;
+				}
+			}
+		}
+
+		document.addEventListener("DOMContentLoaded", () => {
+			const calc = new Calculator(preoperatele, curoperatele);
+			numbutton.forEach((button) => {
+				button.addEventListener("click", () => {
+					calc.appendnumber(button.innerText);
+					calc.updatedisplay();
+				});
+			});
+
+			operationbut.forEach((button) => {
+				button.addEventListener("click", () => {
+					calc.chooseoperation(button.innerText);
+					calc.updatedisplay();
+				});
+			});
+
+			equalbuttton.addEventListener("click", () => {
+				calc.cal();
+				calc.updatedisplay();
+			});
+
+			deletebutton.addEventListener("click", () => {
+				calc.delete();
+				calc.updatedisplay();
+			});
+
+			allcleanbut.addEventListener("click", () => {
+				calc.clear();
+				calc.updatedisplay();
+			});
+		});
+	</script>
+</body>
+</html>
